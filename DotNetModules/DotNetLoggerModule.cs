@@ -12,10 +12,6 @@ namespace DotNetModules
     /*
      * This module logs all the received traffic. 
      * The module has no filtering, so it logs everything into a file. 
-     * The file contains a JSON object. (Currently flat text)
-     * THe JSON object is an array of individual JSON values. 
-     * There are 2 types of such JSON values: markers for being/end of logging 
-     * and effective log data.
      */
     public class DotNetLoggerModule : IGatewayModule
     {
@@ -23,19 +19,24 @@ namespace DotNetModules
         private String logFilePath;
         private String configuration;
 
-        //configuration contains the filepath to log to
+        //configuration contains the filepath of the log
+        //a log is created and a start of log marker is logged
         public void Create(Broker broker, byte[] configuration)
         {
             this.configuration = Encoding.UTF8.GetString(configuration);
             logFilePath = logDirectory + this.configuration;
             WriteToLog("Start of log");
         }
-
+        //before disposing of the logger module
+        //an end of log marker is logged
         public void Destroy()
         {
+            WriteToLog("End of log");
             Console.WriteLine("This is DotNetLoggerModule.Destroy()!");
         }
-
+        //A new message-entry is logged at reception of a message from the broker
+        //No filters are applied with respect to the source of the message, so all
+        //received messages are logged to the file.
         public void Receive(Message received_message)
         {
             createLogDirectory();

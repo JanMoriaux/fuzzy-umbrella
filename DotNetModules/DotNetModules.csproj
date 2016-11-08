@@ -41,8 +41,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DotNetLoggerModule.cs" />
+    <Compile Include="DotNetMapperModule.cs" />
     <Compile Include="DotNetPrinterModule.cs" />
     <Compile Include="DotNetSensorModule.cs" />
+    <Compile Include="DotNetSimulatedDevice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
