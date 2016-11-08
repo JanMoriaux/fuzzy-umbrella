@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.IoT.Gateway;
 
-namespace DotNetPrinterModule
+namespace DotNetModules
 {
     public class DotNetPrinterModule : IGatewayModule
     {

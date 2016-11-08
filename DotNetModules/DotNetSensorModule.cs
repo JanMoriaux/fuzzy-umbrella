@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.Azure.IoT.Gateway;
 
-namespace DotNetSensorModule
+namespace DotNetModules
 {
     public class DotNetSensorModule : IGatewayModule, IGatewayModuleStart
     {
