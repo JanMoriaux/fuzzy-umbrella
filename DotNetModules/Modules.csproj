@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,10 +45,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DotNetLoggerModule.cs" />
-    <Compile Include="DotNetMapperModule.cs" />
     <Compile Include="DotNetPrinterModule.cs" />
     <Compile Include="DotNetSensorModule.cs" />
     <Compile Include="DotNetSimulatedDevice.cs" />
+    <Compile Include="DotNetMapperModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -52,9 +56,14 @@
       <Project>{933fe366-17b4-4643-ac9f-fda442731311}</Project>
       <Name>Microsoft.Azure.IoT.Gateway</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Models\Models.csproj">
+      <Project>{1d9c43fc-c4b0-413a-aac1-275510341f6a}</Project>
+      <Name>Models</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="json\dotnet_binding_sample.json" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

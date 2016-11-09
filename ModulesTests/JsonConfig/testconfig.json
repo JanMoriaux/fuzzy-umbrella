@@ -1,0 +1,14 @@
+﻿{
+   "devices": [
+            {
+              "macAddress": "04:04:04:04:04:04",
+              "deviceId": "DeviceId1",
+              "deviceKey": "DeviceKey1"
+            },
+            {
+              "macAddress": "05:05:05:05:05:05",
+              "deviceId": "DeviceId2",
+              "deviceKey": "DeviceKey2"
+            }
+          ]
+}

@@ -19,7 +19,7 @@ namespace DotNetModules
 
         public void Destroy()
         {
-                        
+            Console.WriteLine("This is DotNetPrinterModule.Destroy()!");         
         }
 
         public void Receive(Message received_message)

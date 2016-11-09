@@ -25,6 +25,7 @@ namespace DotNetModules
         {
             this.configuration = Encoding.UTF8.GetString(configuration);
             logFilePath = logDirectory + this.configuration;
+            Console.WriteLine("Logger created: " + this.configuration);
             WriteToLog("Start of log");
         }
         //before disposing of the logger module

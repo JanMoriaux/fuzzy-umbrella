@@ -27,6 +27,7 @@ namespace DotNetModules
         {
             this.configuration = Encoding.UTF8.GetString(configuration);
             this.broker = broker;
+            Console.WriteLine("Simulated device created: " + this.configuration);
         }
         /// <summary>
         /// Invoked by the Module Host to dispose of the DotNetSimulatedDevice instance.        
@@ -69,6 +70,7 @@ namespace DotNetModules
             //Send a  message containing the MAC-address of the device
             Dictionary<string, string> messageProperties = new Dictionary<string, string>();
             messageProperties.Add("source", "simdevice");
+            messageProperties.Add("type", "macaddress");
             Message macAddressMessage = new Message("MAC Address: " + this.configuration,
                 messageProperties);
             this.broker.Publish(macAddressMessage);
@@ -85,7 +87,8 @@ namespace DotNetModules
                     addTemp = 0.0;
                 }
                 string tempString = (avgTemperature + addTemp).ToString();
-                Message temperatureMessage = new Message("SimDevice Data: " + tempString + " °F", 
+                messageProperties["type"] = "temperaturedata";
+                Message temperatureMessage = new Message("SimDevice Data: " + tempString + " Kelvin", 
                     messageProperties);
                 this.broker.Publish(temperatureMessage);
 
