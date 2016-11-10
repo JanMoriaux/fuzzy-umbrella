@@ -1,0 +1,63 @@
+{
+  "modules": [
+    {
+      "module name": "dotnet_logger_module",
+      "module path": "..\\..\\..\\bindings\\dotnet\\Debug\\dotnet_hl.dll",
+      "args": {
+        "dotnet_module_path": "DotNetModules",
+        "dotnet_module_entry_class": "DotNetModules.DotNetLoggerModule",
+        "dotnet_module_args": "dotnetloggertest.txt"
+      }
+    },
+    {
+      "module name": "dotnet_simulated_device",
+      "module path": "..\\..\\..\\bindings\\dotnet\\Debug\\dotnet_hl.dll",
+      "args": {
+        "dotnet_module_path": "DotNetModules",
+        "dotnet_module_entry_class": "DotNetModules.DotNetSimulatedDevice",
+        "dotnet_module_args": "04:04:04:04:04:04"
+      }
+    },
+    {
+      "module name": "dotnet_printer_module",
+      "module path": "..\\..\\..\\bindings\\dotnet\\Debug\\dotnet_hl.dll",
+      "args": {
+        "dotnet_module_path": "DotNetModules",
+        "dotnet_module_entry_class": "DotNetModules.DotNetPrinterModule",
+        "dotnet_module_args": "printer configuration"
+      }
+    },
+    {
+      "module name": "dotnet_sensor_module",
+      "module path": "..\\..\\..\\bindings\\dotnet\\Debug\\dotnet_hl.dll",
+      "args": {
+        "dotnet_module_path": "DotNetModules",
+        "dotnet_module_entry_class": "DotNetModules.DotNetSensorModule",
+        "dotnet_module_args": "sensor configuration"
+      }
+    },
+    {
+      "module name": "dotnet_mapper_module",
+      "module path": "..\\..\\..\\bindings\\dotnet\\Debug\\dotnet_hl.dll",
+      "args": {
+        "dotnet_module_path": "DotNetModules",
+        "dotnet_module_entry_class": "DotNetModules.DotNetMapperModule",
+        "dotnet_module_args": "{\"devices\":[{\"macAddress\": \"04:04:04:04:04:04\",\"deviceId\": \"DeviceId1\",\"deviceKey\": \"DeviceKey1\"},{\"macAddress\": \"05:05:05:05:05:05\",\"deviceId\": \"DeviceId2\",\"deviceKey\": \"DeviceKey2\"}]}"
+      }
+    }
+  ],
+  "links": [
+    {
+      "source": "dotnet_sensor_module",
+      "sink": "dotnet_printer_module"
+    },
+    {
+      "source": "*",
+      "sink": "dotnet_logger_module"
+    },
+    {
+      "source": "dotnet_simulated_device",
+      "sink": "dotnet_mapper_module"
+    }
+  ]
+}
