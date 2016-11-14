@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D4051CEB-9B6B-4E14-B1A7-8ADE7BDEBFE9}</ProjectGuid>
+    <ProjectGuid>{C475DB79-5FF9-4D94-A6C2-D2AEB4661F15}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DotNetModules</RootNamespace>
-    <AssemblyName>DotNetModules</AssemblyName>
+    <RootNamespace>ClassLibrary1</RootNamespace>
+    <AssemblyName>ClassLibrary1</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -44,29 +44,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DotNetLoggerModule.cs" />
-    <Compile Include="DotNetPrinterModule.cs" />
-    <Compile Include="DotNetSensorModule.cs" />
-    <Compile Include="DotNetSimulatedDevice.cs" />
-    <Compile Include="DotNetMapperModule.cs" />
+    <Compile Include="JsonUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\azure-iot-gateway-sdk\bindings\dotnet\dotnet-binding\Microsoft.Azure.IoT.Gateway\Microsoft.Azure.IoT.Gateway.csproj">
-      <Project>{933fe366-17b4-4643-ac9f-fda442731311}</Project>
-      <Name>Microsoft.Azure.IoT.Gateway</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ClassLibrary1\Utils.csproj">
-      <Project>{c475db79-5ff9-4d94-a6c2-d2aeb4661f15}</Project>
-      <Name>Utils</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Models\Models.csproj">
-      <Project>{1d9c43fc-c4b0-413a-aac1-275510341f6a}</Project>
-      <Name>Models</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="json\allModules.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

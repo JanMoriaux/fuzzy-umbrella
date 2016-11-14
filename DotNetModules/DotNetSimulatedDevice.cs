@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Azure.IoT.Gateway;
 using System.Threading;
 using Newtonsoft.Json;
 using System.IO;
+using DotNetModules.Utils;
 
 namespace DotNetModules
-{
-    //A simulated device module
+{    
     public class DotNetSimulatedDevice : IGatewayModule, IGatewayModuleStart
     {
         private Broker broker;
@@ -30,34 +28,30 @@ namespace DotNetModules
         public void Create(Broker broker, byte[] configuration)
         {
             this.configuration = Encoding.UTF8.GetString(configuration);
-            this.broker = broker;
-            //Console.WriteLine("Simulated device created: " + this.configuration);
+            this.broker = broker;            
         }        
         /// <summary>
-        /// Invoked by the Module Host to dispose of the DotNetSimulatedDevice instance.        
+        /// Invoked by the Module Host to release the resources used by the DotNetSimulatedDevice        
         /// </summary>
         public void Destroy()
         {
             Console.WriteLine("This is DotNetSimulatedDevice.destroy()!");
-        }
-        //The DotNetSimulatedDevice receives a message from the broker.
-        //A filter is applied to only accept c2d messages redirected
-        //through the mapper module.
-        //An acknowledgment message is sent back to the cloud.
+        }        
         /// <summary>
-        /// 
+        /// Messages are filtered to only receive messages containing 
+        /// a "macAddress"-property set to its own macAddress and a source property set to mapping.
+        /// A feedback message is sent back to the cloud.
         /// </summary>
-        /// <param name="received_message"></param>
+        /// <param name="received_message">The message received from the gateway broker</param>
         public void Receive(Message received_message)
         {
-            if (received_message.Properties["source"] == "dotnetmapper" &&
-                received_message.Properties["macAddress"] == this.configuration &&
-                received_message.Properties["type"] == "c2d")
+            if (received_message.Properties["source"] == "mapping2device" &&
+                received_message.Properties["macAddress"] == this.configuration) //&&                
             {
-                //sends a message to the mapper that cloud info has been received   
+                //send a message to the mapper that cloud info has been received   
                 String receivedContent = Encoding.UTF8.GetString(received_message.Content, 0,
-                    received_message.Content.Length);                            
-                String msgContent = this.CreateJsonString(receivedContent + " returns");
+                    received_message.Content.Length);
+                String msgContent = JsonUtils.CreateJsonString(receivedContent + " returns",this.configuration);
                 Message ackMessage = new Message(msgContent, CreateMessageProperties());
                 this.Publish(ackMessage);                
             }       
@@ -86,7 +80,7 @@ namespace DotNetModules
                     addTemp = 0.0;
                 }
                 string tempString = (avgTemperature + addTemp).ToString();                
-                String msgContent = this.CreateJsonString(tempString + "°C");
+                String msgContent = JsonUtils.CreateJsonString(tempString + "°C",this.configuration);
                 Message temperatureMessage = new Message(msgContent, 
                     CreateMessageProperties());
 
@@ -103,36 +97,10 @@ namespace DotNetModules
         {
             Dictionary<string, string> messageProperties = new Dictionary<string, string>();
             messageProperties["source"] = "simdevice";
-            messageProperties["type"] = "d2c";
+            //messageProperties["type"] = "d2c";
             messageProperties["macAddress"] = this.configuration;
             return messageProperties;
-        }        
-        private String CreateJsonString(string content)
-        {
-            StringBuilder sb = new StringBuilder();
-            StringWriter sw = new StringWriter(sb);
-
-            using (JsonWriter writer = new JsonTextWriter(sw))
-            {
-                writer.Formatting = Formatting.None;
-                  
-                writer.WriteStartArray();
-                writer.WriteStartObject();
-                writer.WritePropertyName("device");
-                writer.WriteValue(this.configuration);
-                writer.WriteEndObject();
-                writer.WriteStartObject();
-                writer.WritePropertyName("content");
-                writer.WriteValue(content);
-                writer.WriteEndObject();
-                writer.WriteEnd();
-            }
-            return sb.ToString();
         }
-        /// <summary>
-        /// Publishes messages to the broker
-        /// </summary>
-        /// <param name="msg">The Message instance to publish</param>
         private void Publish(Message msg)
         {
             Console.WriteLine(Encoding.UTF8.GetString(msg.Content));

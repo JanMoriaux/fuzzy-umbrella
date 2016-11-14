@@ -10,19 +10,16 @@ using System.Data;
 
 namespace DotNetModules
 {
-
-    /* TODO:     
+    /*      
      * 
      * mapper receives deviceidentities from IoT Hub module and automatically maps
      * them to a MAC address
      */
-    public class DotNetMapperModule : IGatewayModule//, IGatewayModuleStart
+    public class DotNetMapperModule : IGatewayModule
     {
         private Broker broker;
         private String configuration;
         private Dictionary<string, DeviceIdentity> devices;
-
-
 
         public void Create(Broker broker, byte[] configuration)
         {
@@ -41,31 +38,37 @@ namespace DotNetModules
 
         public void Destroy()
         {
-            Console.WriteLine("DotNetMapperModule.Destroy()!");
+            Console.WriteLine("This isDotNetMapperModule.Destroy()!");
         }
 
         public void Receive(Message received_message)
         {
-            //Mapper module receives message from device
-            //and automatically forwards it to the IoTHub module
-            //with device identity information
-            if (received_message.Properties["source"] == "simdevice" &&
-                received_message.Properties["type"] == "d2c")
+            /*
+             * D2C messages are filtered for a macAddress property and the absence of
+             * a deviceName/deviceKey property or a source property set to "mapping"
+             */
+            bool macInProps = received_message.Properties.ContainsKey("macAddress");
+            bool identityinProps = received_message.Properties.ContainsKey("deviceKey") ||
+                received_message.Properties.ContainsKey("deviceName");
+            bool sourceIsMapping = received_message.Properties["source"] == "mapping";
+
+            if(macInProps && !identityinProps && !sourceIsMapping)
             {
                 //look up the device's deviceKey and DeviceId
                 DeviceIdentity deviceIdentity = devices[received_message.Properties["macAddress"]];
 
                 //Create a message to publish to the broker, that will be received by the IoT-Hub module                                
                 Message msg = this.CreateMessage(deviceIdentity.DeviceId, deviceIdentity.DeviceKey,
-                    received_message.Content);
+                    received_message);
 
                 //publish to broker
                 this.Publish(msg);
-            }
-            //mapper receives message from IoTHub 
-            //automatically publishes message to broker
-            //aimed at a given device
-            if (received_message.Properties["source"] == "iothub")
+            }                                        
+            /*
+             * C2D messages are filtered for a "source" property set to "iothub" and a deviceName property            
+            */
+            if (received_message.Properties["source"] == "iothub" &&
+                received_message.Properties.ContainsKey("deviceName"))
             {
                 Console.WriteLine("Mapper receives message from iothub");
                 //look up the MAC-address
@@ -76,18 +79,12 @@ namespace DotNetModules
                 //Create a message for the device
                 //with the given MAC-address
                 Message msg = CreateMessage(macAddress, null,
-                    received_message.Content);
+                    received_message);
 
                 //publish to broker
                 this.Publish(msg);
             }
-        }
-        //public void Start()
-        //{
-        //    Thread oThread = new Thread(new ThreadStart(ThreadBody));
-        //    oThread.Start();
-
-        //}
+        }       
         private void Publish(Message message)
         {
             try
@@ -100,24 +97,12 @@ namespace DotNetModules
                 Console.WriteLine(e.Message);
                 Console.WriteLine(e.StackTrace);
             }
-        }
-
-        //private void ThreadBody()
-        //{
-        //    while (true)
-        //    {
-        //        Message msg =
-        //            CreateMessage("01:01:01:01:01:01", null,
-        //            Encoding.ASCII.GetBytes("testmessage from mapper"));
-        //        broker.Publish(msg);
-        //        Thread.Sleep(10000);
-        //    }
-        //}
+        }        
         private void LoadDevices()
         {
             try
             {
-                //initializes a dictionary with key = macaddress and value = deviceidentity
+                //initializes a dictionary with key = macaddress and value = deviceidentity key/value
                 //from the configuration
                 this.devices = new Dictionary<string, DeviceIdentity>();
                 DataSet configSet = JsonConvert.DeserializeObject<DataSet>(this.configuration);
@@ -129,15 +114,7 @@ namespace DotNetModules
                         DeviceKey = row["deviceKey"].ToString(),
                         DeviceId = row["deviceId"].ToString()
                     };
-                }
-
-                //prints the mapped devices to console
-                //Console.WriteLine("Devices:\n");
-                //foreach (var device in this.devices)
-                //{
-                //    Console.WriteLine(device.Key + "\t" + device.Value.DeviceId + "\t" + device.Value.DeviceKey);
-                //}
-                //Console.WriteLine();
+                }               
             }
             catch (Exception e)
             {
@@ -145,23 +122,30 @@ namespace DotNetModules
                 Console.WriteLine(e.StackTrace);
             }
         }
-        private Message CreateMessage(string deviceName, string deviceKey, byte[] content)
+        private Message CreateMessage(string deviceName, string deviceKey, Message message)
         {
-            Dictionary<string, string> msgProperties = new Dictionary<string, string>();
+            Dictionary<string, string> msgProperties = message.Properties;
             if (deviceKey != null)
             {
+                //add source and registered identity properties
                 msgProperties["source"] = "mapping";
                 msgProperties["deviceName"] = deviceName;
                 msgProperties["deviceKey"] = deviceKey;
-                msgProperties["type"] = "d2c";
+                
+                //remove the "macAddress" property
+                msgProperties.Remove("macAddress");
             }
             else
             {
-                msgProperties["source"] = "dotnetmapper";
+                //add source and macaddress properties
+                msgProperties["source"] = "mapping2device";
                 msgProperties["macAddress"] = deviceName;
-                msgProperties["type"] = "c2d";
+                
+                //remove the deviceName/deviceKey properties
+                msgProperties.Remove("deviceName");
+                msgProperties.Remove("deviceKey");
             }
-            Message msg = new Message(content, msgProperties);
+            Message msg = new Message(message.Content, msgProperties);
             return msg;
         }
     }
