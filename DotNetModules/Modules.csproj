@@ -56,10 +56,6 @@
       <Project>{933fe366-17b4-4643-ac9f-fda442731311}</Project>
       <Name>Microsoft.Azure.IoT.Gateway</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ClassLibrary1\Utils.csproj">
-      <Project>{c475db79-5ff9-4d94-a6c2-d2aeb4661f15}</Project>
-      <Name>Utils</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Models\Models.csproj">
       <Project>{1d9c43fc-c4b0-413a-aac1-275510341f6a}</Project>
       <Name>Models</Name>
