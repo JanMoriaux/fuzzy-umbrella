@@ -50,11 +50,14 @@ namespace DotNetModules
         /// <param name="received_message"></param>
         public void Receive(Message received_message)
         {
-            if (received_message.Properties["source"] == "mapping" &&
+            if (received_message.Properties["source"] == "dotnetmapper" &&
+                received_message.Properties["macAddress"] == this.configuration &&
                 received_message.Properties["type"] == "c2d")
-            {                
-                //sends a message to the mapper that cloud info has been received                               
-                String msgContent = this.CreateJsonString("cloud message received");
+            {
+                //sends a message to the mapper that cloud info has been received   
+                String receivedContent = Encoding.UTF8.GetString(received_message.Content, 0,
+                    received_message.Content.Length);                            
+                String msgContent = this.CreateJsonString(receivedContent + " returns");
                 Message ackMessage = new Message(msgContent, CreateMessageProperties());
                 this.Publish(ackMessage);                
             }       
@@ -111,10 +114,8 @@ namespace DotNetModules
 
             using (JsonWriter writer = new JsonTextWriter(sw))
             {
-                writer.Formatting = Formatting.Indented;
-
-                writer.WriteStartObject();
-                writer.WritePropertyName("message");
+                writer.Formatting = Formatting.None;
+                  
                 writer.WriteStartArray();
                 writer.WriteStartObject();
                 writer.WritePropertyName("device");
@@ -125,7 +126,6 @@ namespace DotNetModules
                 writer.WriteValue(content);
                 writer.WriteEndObject();
                 writer.WriteEnd();
-                writer.WriteEndObject();
             }
             return sb.ToString();
         }

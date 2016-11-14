@@ -24,9 +24,9 @@ namespace DotNetModules
 
         public void Receive(Message received_message)
         {
-            if (received_message.Properties["source"] == "sensor")
+            if (received_message.Properties["source"] == "simdevice")
             {
-                Console.WriteLine("Printer Module received message from Sensor. Content " +
+                Console.WriteLine("Printer Module received message from simulated device. Content " +
                     Encoding.UTF8.GetString(received_message.Content, 0, 
                     received_message.Content.Length));
             }

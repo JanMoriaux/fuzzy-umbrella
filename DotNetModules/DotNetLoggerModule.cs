@@ -25,7 +25,7 @@ namespace DotNetModules
         {
             this.configuration = Encoding.UTF8.GetString(configuration);
             logFilePath = logDirectory + this.configuration;
-            Console.WriteLine("Logger created: " + this.configuration);
+            //Console.WriteLine("Logger created: " + this.configuration);
             WriteToLog("Start of log");
         }
         //before disposing of the logger module
@@ -38,22 +38,26 @@ namespace DotNetModules
         //A new message-entry is logged at reception of a message from the broker
         //No filters are applied with respect to the source of the message, so all
         //received messages are logged to the file.
+        //Json configuration "links"-object is set accordingly
         public void Receive(Message received_message)
         {
             createLogDirectory();
             try
             {
-            using (StreamWriter writer = new StreamWriter(logFilePath, true))
-            {
-                string content = Encoding.UTF8.GetString(received_message.Content, 0,
-                    received_message.Content.Length);
-                string source = received_message.Properties["source"];
-                writer.WriteLine("Start of message");
-                writer.WriteLine("Source: " + source);
-                writer.WriteLine("Content: " + content);
-                writer.WriteLine("End of message");
-                writer.WriteLine();
-            }
+                using (StreamWriter writer = new StreamWriter(logFilePath, true))
+                {
+                    string content = Encoding.UTF8.GetString(received_message.Content, 0,
+                        received_message.Content.Length);                    
+                    writer.WriteLine("**************");
+                    writer.WriteLine("Time: " + DateTime.UtcNow);
+                    foreach (var msgProp in received_message.Properties)
+                    {
+                        writer.WriteLine(msgProp.Key + ": " + msgProp.Value);
+                    }
+                    writer.WriteLine("Content: " + content);
+                    writer.WriteLine("**************");
+                    writer.WriteLine();
+                }
             }
             catch (IOException e)
             {
@@ -80,9 +84,9 @@ namespace DotNetModules
             catch (IOException e)
             {
                 Console.WriteLine("Unable to write to file: " + logFilePath);
-                Console.WriteLine(e.Message);                
+                Console.WriteLine(e.Message);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }

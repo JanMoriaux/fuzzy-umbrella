@@ -16,12 +16,12 @@ namespace DotNetModules
      * mapper receives deviceidentities from IoT Hub module and automatically maps
      * them to a MAC address
      */
-    public class DotNetMapperModule : IGatewayModule //,IGatewayModuleStart
+    public class DotNetMapperModule : IGatewayModule//, IGatewayModuleStart
     {
         private Broker broker;
         private String configuration;
         private Dictionary<string, DeviceIdentity> devices;
-        //private Boolean gatewayIsReady = false;
+
 
 
         public void Create(Broker broker, byte[] configuration)
@@ -36,7 +36,7 @@ namespace DotNetModules
             {
                 Console.WriteLine(e.Message);
             }
-            //Console.WriteLine("Mapper configuration: " + this.configuration);
+
         }
 
         public void Destroy()
@@ -51,7 +51,7 @@ namespace DotNetModules
             //with device identity information
             if (received_message.Properties["source"] == "simdevice" &&
                 received_message.Properties["type"] == "d2c")
-            {                
+            {
                 //look up the device's deviceKey and DeviceId
                 DeviceIdentity deviceIdentity = devices[received_message.Properties["macAddress"]];
 
@@ -65,9 +65,9 @@ namespace DotNetModules
             //mapper receives message from IoTHub 
             //automatically publishes message to broker
             //aimed at a given device
-            if (received_message.Properties["source"] == "iothub" &&
-               received_message.Properties["type"] == "c2d")
+            if (received_message.Properties["source"] == "iothub")
             {
+                Console.WriteLine("Mapper receives message from iothub");
                 //look up the MAC-address
                 string deviceId = received_message.Properties["deviceName"];
                 string macAddress = devices.Keys.Where(p => devices[p].DeviceId == deviceId).
@@ -84,28 +84,10 @@ namespace DotNetModules
         }
         //public void Start()
         //{
-        //    //Thread oThread = new Thread(new ThreadStart(ThreadBody));
-        //    //oThread.Start();
-        //    this.gatewayIsReady = true;
+        //    Thread oThread = new Thread(new ThreadStart(ThreadBody));
+        //    oThread.Start();
+
         //}
-        private Message CreateMessage(string deviceName, string deviceKey, byte[] content)
-        {
-            Dictionary<string, string> msgProperties = new Dictionary<string, string>();
-            msgProperties["source"] = "mapping";
-            if (deviceKey != null)
-            {
-                msgProperties["deviceName"] = deviceName;
-                msgProperties["deviceKey"] = deviceKey;
-                msgProperties["type"] = "d2c";
-            }
-            else
-            {
-                msgProperties["macAddress"] = deviceName;
-                msgProperties["type"] = "c2d";
-            }
-            Message msg = new Message(content, msgProperties);
-            return msg;
-        }
         private void Publish(Message message)
         {
             try
@@ -122,11 +104,14 @@ namespace DotNetModules
 
         //private void ThreadBody()
         //{
-        //    this.LoadDevices();
-        //    Dictionary<string, string> msgProperties = new Dictionary<string, string>();
-        //    msgProperties["source"] = "mapping";
-        //    Message msg = new Message("Mappings:\n" + this.configuration, msgProperties);
-        //    broker.Publish(msg);
+        //    while (true)
+        //    {
+        //        Message msg =
+        //            CreateMessage("01:01:01:01:01:01", null,
+        //            Encoding.ASCII.GetBytes("testmessage from mapper"));
+        //        broker.Publish(msg);
+        //        Thread.Sleep(10000);
+        //    }
         //}
         private void LoadDevices()
         {
@@ -159,6 +144,25 @@ namespace DotNetModules
                 Console.WriteLine(e.Message);
                 Console.WriteLine(e.StackTrace);
             }
+        }
+        private Message CreateMessage(string deviceName, string deviceKey, byte[] content)
+        {
+            Dictionary<string, string> msgProperties = new Dictionary<string, string>();
+            if (deviceKey != null)
+            {
+                msgProperties["source"] = "mapping";
+                msgProperties["deviceName"] = deviceName;
+                msgProperties["deviceKey"] = deviceKey;
+                msgProperties["type"] = "d2c";
+            }
+            else
+            {
+                msgProperties["source"] = "dotnetmapper";
+                msgProperties["macAddress"] = deviceName;
+                msgProperties["type"] = "c2d";
+            }
+            Message msg = new Message(content, msgProperties);
+            return msg;
         }
     }
 }

@@ -44,20 +44,48 @@
         "dotnet_module_entry_class": "DotNetModules.DotNetMapperModule",
         "dotnet_module_args": "{\"devices\":[{\"macAddress\": \"04:04:04:04:04:04\",\"deviceId\": \"DeviceId1\",\"deviceKey\": \"DeviceKey1\"},{\"macAddress\": \"05:05:05:05:05:05\",\"deviceId\": \"DeviceId2\",\"deviceKey\": \"DeviceKey2\"}]}"
       }
-    }
-  ],
-  "links": [
-    {
-      "source": "dotnet_sensor_module",
-      "sink": "dotnet_printer_module"
     },
+     {
+            "module name" : "IotHub",
+            "module path" : "..\\..\\..\\modules\\iothub\\Debug\\iothub_hl.dll",
+            "args" : 
+            {
+                "IoTHubName" : "<IoTHubName Here>",
+                "IoTHubSuffix" : "azure-devices.net",
+                "Transport" : "AMQP"
+            }
+        }
+  ],
+  "links": [    
     {
       "source": "*",
       "sink": "dotnet_logger_module"
     },
     {
-      "source": "dotnet_simulated_device",
+      "source": "dotnet_simulated_device_1",
+      "sink": "dotnet_mapper_module"
+    },
+    {
+      "source": "dotnet_simulated_device_2",
+      "sink": "dotnet_mapper_module"
+    },
+    {
+      "source": "dotnet_mapper_module",
+      "sink": "IotHub"
+    },
+    {
+      "source": "dotnet_mapper_module",
+      "sink": "dotnet_simulated_device_1"
+    },
+    {
+      "source": "dotnet_mapper_module",
+      "sink": "dotnet_simulated_device_2"
+    },
+    {
+      "source": "IotHub",
       "sink": "dotnet_mapper_module"
     }
   ]
 }
+
+  
